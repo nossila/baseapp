@@ -56,8 +56,8 @@ class Revision(DjangoObjectType):
     def resolve_before(self, info):
         return self.parent
 
-    def resolve_content_object(self, info):
-        return None
+    #  def resolve_content_object(self, info):
+        #  return None
         #  Model = self.document.content_type.model_class()
         #  return Model.objects_revisions.get(pk=self.pk)
 
@@ -91,7 +91,6 @@ class RevisionedType(graphene.Interface):
     #              pk=self.document.revision_created_id)
 
     def resolve_revisions(self, info, **kwargs):
-        breakpoint()
         return Revision._meta.model.objects.filter(
             content_type=ContentType.objects.get_for_model(self),
             object_id=self.pk,

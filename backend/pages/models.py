@@ -3,6 +3,7 @@ from versioning.models import Revision, RevisionedModel, REVISION_TYPES
 from ipware import get_client_ip
 from django.contrib.contenttypes.models import ContentType
 
+
 class Page(RevisionedModel):
     title = models.CharField(max_length=255)
     url = models.URLField(max_length=255, unique=True)
@@ -42,7 +43,7 @@ class Page(RevisionedModel):
 
         revision = Revision.objects.create(
             type=revision_type,
-            content_type=ContentType.objects.get_for_model(Page),
+            content_type=ContentType.objects.get_for_model(self),
             parent_id=parent_id,
             author=author,
             author_ip=ip,
