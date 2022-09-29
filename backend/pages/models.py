@@ -42,7 +42,7 @@ class Page(RevisionedModel):
 
         revision = Revision.objects.create(
             type=revision_type,
-            content_type=ContentType.objects.get_for_model(self),
+            content_type=ContentType.objects.get_for_model(Page),
             parent_id=parent_id,
             author=author,
             author_ip=ip,
@@ -53,6 +53,16 @@ class Page(RevisionedModel):
         self.revision = revision
 
         super().save(*args, **kwargs)
+
+        content_object = PageRevision.objects.create(
+            revision=revision,
+            content_object=self,
+
+            title=self.title,
+            url=self.url,
+            body=self.body,
+            published_at=self.published_at,
+        )
 
         revision.object_id = self.pk
         revision.save(update_fields=["object_id"])

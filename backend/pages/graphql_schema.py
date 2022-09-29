@@ -7,6 +7,7 @@ from graphene_django.filter import DjangoFilterConnectionField
 
 from .models import Page as PageModel
 from backend.graphene import CountedConnection
+from versioning.graphql_schema import RevisionedType
 #  from commenting.models_graphql import CommentsNode
 #  from images.models_graphql import ImagesNode
 
@@ -14,7 +15,7 @@ from backend.graphene import CountedConnection
 class Page(DjangoObjectType):
     class Meta:
         model = PageModel
-        interfaces = (relay.Node,)
+        interfaces = (relay.Node, RevisionedType)
         filter_fields = []
         connection_class = CountedConnection
 
