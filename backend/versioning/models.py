@@ -4,10 +4,11 @@ from model_utils import Choices
 from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from ipware import get_client_ip
 
 REVISION_TYPES = Choices(
     ('create', _("Create")),
-    ('change', _("Change")),
+    ('update', _("Update")),
     ('delete', _("Delete")),
 )
 
@@ -38,4 +39,57 @@ class RevisionedModel(models.Model):
 
     class Meta:
         abstract = True
+
+    def save(self, *args, **kwargs):
+        request = kwargs.pop("request", None)
+        message = kwargs.pop("message", None)
+        parent = kwargs.pop("parent", None)
+
+        parent_id = None
+        if self.revision_id and not parent:
+            parent_id = self.revision_id
+        elif parent:
+            parent_id = parent.pk
+
+        author = None
+        ip = None
+        useragent = None
+        if request:
+            if request.user.is_authenticated:
+                author = request.user
+            ip, is_routable = get_client_ip(request)
+            useragent = request.META.get('HTTP_USER_AGENT')
+            if hasattr(request, 'revisionMessage') and not message:
+                message = request.revisionMessage
+
+        revision_type = None
+        if not parent_id:
+            revision_type = REVISION_TYPES.create
+        #  elif self.is_deleted:
+        #      revision_type = REVISION_TYPES.delete
+        else:
+            revision_type = REVISION_TYPES.update
+
+        revision = Revision.objects.create(
+            type=revision_type,
+            content_type=ContentType.objects.get_for_model(self),
+            parent_id=parent_id,
+            author=author,
+            author_ip=ip,
+            author_useragent=useragent,
+            message=message,
+        )
+
+        self.revision = revision
+
+        super().save(*args, **kwargs)
+        self.save_revision()
+
+        self.revision.object_id = self.pk
+        self.revision.save(update_fields=["object_id"])
+
+    def update(self, payload, request=None):
+        for name, value in payload.items():
+            setattr(self, name, value)
+        self.save(request=request)
 

@@ -1,5 +1,6 @@
 import graphene
 from graphene_django import DjangoConnectionField, DjangoObjectType
+from graphene_django.registry import get_global_registry
 
 #  from .models_graphql import Revision
 #  from .types import DocumentBase
@@ -8,7 +9,7 @@ from django.contrib.contenttypes.models import ContentType
 
 class RevisionType(graphene.Enum):
     CREATE = REVISION_TYPES.create
-    UPDATE = REVISION_TYPES.change
+    UPDATE = REVISION_TYPES.update
     DELETE = REVISION_TYPES.delete
 
     @property
@@ -23,6 +24,15 @@ def get_versioned_type():
             pass
             # pegar types atraves de um register?
             types = (Page,)
+
+        @classmethod
+        def resolve_type(cls, instance, info):
+            registry = get_global_registry()
+            graphql_type = registry._registry[instance.__class__] 
+            return registry._registry[instance.__class__]
+            #  from .objecttype import ObjectType  # NOQA
+            #  if isinstance(instance, ObjectType):
+            #      return type(instance)
     return VersionedType
 
 
@@ -56,10 +66,11 @@ class Revision(DjangoObjectType):
     def resolve_before(self, info):
         return self.parent
 
-    #  def resolve_content_object(self, info):
+    def resolve_content_object(self, info):
+        #  breakpoint()
         #  return None
-        #  Model = self.document.content_type.model_class()
-        #  return Model.objects_revisions.get(pk=self.pk)
+        Model = self.content_type.model_class()
+        return Model.get_revision_model().objects.get(revision_id=self.pk)
 
     def resolve_typeDisplay(self, info):
         return self.get_type_display()
