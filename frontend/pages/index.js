@@ -1,29 +1,27 @@
 import Link from 'next/link'
-import { fetchQuery } from 'react-relay'
-import { initEnvironment } from '../lib/relay'
-import BlogPosts from '../components/BlogPosts'
-import indexPageQuery from '../queries/indexPage'
+import { graphql } from 'react-relay'
+import { getRelayStaticProps } from '../lib/relay'
+import Pages from '../components/Pages'
 
 const Index = ({ viewer }) => (
   <div>
     <Link href="/about">
       <a>About</a>
     </Link>
-    <BlogPosts viewer={viewer} />
+    <Pages viewer={viewer} />
   </div>
 )
 
-export async function getStaticProps() {
-  const environment = initEnvironment()
-  const queryProps = await fetchQuery(environment, indexPageQuery)
-  const initialRecords = environment.getStore().getSource().toJSON()
-
-  return {
-    props: {
-      ...queryProps,
-      initialRecords,
-    },
+const query = graphql`
+  query pagesIndexQuery {
+    viewer {
+      ...Pages_viewer
+    }
   }
+`
+
+export async function getStaticProps() {
+  return getRelayStaticProps(query)
 }
 
 export default Index

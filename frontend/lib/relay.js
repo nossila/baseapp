@@ -1,12 +1,12 @@
 import { useMemo } from 'react'
 import { Environment, Network, RecordSource, Store } from 'relay-runtime'
+import { fetchQuery } from 'react-relay'
 
 let relayEnvironment
 
 // Define a function that fetches the results of an operation (query/mutation/etc)
 // and returns its results as a Promise
-function fetchQuery(operation, variables, cacheConfig, uploadables) {
-  console.log('process.env.NEXT_PUBLIC_RELAY_ENDPOINT', process.env.NEXT_PUBLIC_RELAY_ENDPOINT)
+function networkFetchQuery(operation, variables, cacheConfig, uploadables) {
   return fetch(process.env.NEXT_PUBLIC_RELAY_ENDPOINT, {
     method: 'POST',
     headers: {
@@ -23,7 +23,7 @@ function fetchQuery(operation, variables, cacheConfig, uploadables) {
 function createEnvironment(initialRecords) {
   return new Environment({
     // Create a network layer from the fetch function
-    network: Network.create(fetchQuery),
+    network: Network.create(networkFetchQuery),
     store: new Store(new RecordSource()),
   })
 }
@@ -48,4 +48,17 @@ export function initEnvironment(initialRecords) {
 export function useEnvironment(initialRecords) {
   const store = useMemo(() => initEnvironment(initialRecords), [initialRecords])
   return store
+}
+
+export async function getRelayStaticProps(query) {
+  const environment = initEnvironment()
+  const queryProps = await fetchQuery(environment, query)
+  const initialRecords = environment.getStore().getSource().toJSON()
+
+  return {
+    props: {
+      ...queryProps,
+      initialRecords,
+    },
+  }
 }

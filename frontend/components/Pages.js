@@ -1,24 +1,24 @@
 import { createFragmentContainer, graphql } from 'react-relay'
-import BlogPostPreview from './BlogPostPreview'
+import PagePreview from './PagePreview'
 
-const BlogPosts = ({ viewer }) => {
+const Pages = ({ viewer }) => {
   return <div>
-    <h1>Blog posts</h1>
+    <h1>Pages</h1>
     <ul>
       {viewer.allPages.edges.map(({ node }) => (
-        <BlogPostPreview key={node.id} post={node} />
+        <PagePreview key={node.id} page={node} />
       ))}
     </ul>
   </div>
 }
 
-export default createFragmentContainer(BlogPosts, {
+export default createFragmentContainer(Pages, {
   viewer: graphql`
-    fragment BlogPosts_viewer on Query {
+    fragment Pages_viewer on Query {
       allPages(first: 10) {
         edges {
           node {
-            ...BlogPostPreview_post
+            ...PagePreview_post
             id
           }
         }
