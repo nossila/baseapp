@@ -6,6 +6,7 @@ from graphene_django.registry import get_global_registry
 #  from .types import DocumentBase
 from .models import Revision as RevisionModel, REVISION_TYPES
 from django.contrib.contenttypes.models import ContentType
+from backend.graphene import CountedConnection
 
 class RevisionType(graphene.Enum):
     CREATE = REVISION_TYPES.create
@@ -50,6 +51,8 @@ class Revision(DjangoObjectType):
     class Meta:
         model = RevisionModel
         interfaces = (graphene.relay.Node, )
+        connection_class = CountedConnection
+        #  convert_choices_to_enum = ["type"] # nao testei, mas na teoria funciona
 
     def resolve_id_int(self, info):
         return self.id
@@ -67,12 +70,11 @@ class Revision(DjangoObjectType):
         return self.parent
 
     def resolve_content_object(self, info):
-        #  breakpoint()
-        #  return None
         Model = self.content_type.model_class()
-        return Model.get_revision_model().objects.get(revision_id=self.pk)
+        ModelRevision = Model.get_revision_model()
+        return ModelRevision.objects.get(revision_id=self.pk)
 
-    def resolve_typeDisplay(self, info):
+    def resolve_type_display(self, info):
         return self.get_type_display()
 
     def resolve_is_tip(self, info):

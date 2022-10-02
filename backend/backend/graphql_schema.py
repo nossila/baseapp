@@ -1,5 +1,6 @@
 from graphene import ObjectType, Schema, Field, ID, relay
 from graphene.relay.node import NodeField as RelayNodeField
+from graphene_django.debug import DjangoDebug
 from pages.graphql_schema import Query as PagesQuery
 from pages.graphql_mutations import Mutation as PagesMutation
 
@@ -26,6 +27,8 @@ class Query(PagesQuery, ObjectType):
     viewer = Field(lambda: Query)
 
     node = NodeField(relay.Node)
+
+    debug = Field(DjangoDebug, name='_debug')
 
     class Meta:
         interfaces = (relay.Node,)

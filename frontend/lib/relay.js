@@ -50,10 +50,12 @@ export function useEnvironment(initialRecords) {
   return store
 }
 
-export async function getRelayStaticProps(query) {
+export async function getRelayStaticProps(query, variables, options) {
   const environment = initEnvironment()
-  const queryProps = await fetchQuery(environment, query)
+  const queryProps = await fetchQuery(environment, query, variables, options)
   const initialRecords = environment.getStore().getSource().toJSON()
+
+  console.log('initialRecords', initialRecords)
 
   return {
     props: {

@@ -17,7 +17,9 @@ class Page(DjangoObjectType):
     class Meta:
         model = PageModel
         interfaces = (relay.Node, RevisionedType)
-        filter_fields = []
+        filter_fields = {
+            'url': ['exact']
+        }
         connection_class = CountedConnection
 
         #  @classmethod

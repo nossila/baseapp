@@ -1,6 +1,7 @@
 import { createFragmentContainer, graphql } from 'react-relay'
+import Link from 'next/link'
 
-const PagePreview = ({ page }) => <li>{page.title}</li>
+const PagePreview = ({ page }) => <li><Link href={`/${page.url}`}>{page.title}</Link></li>
 
 export default createFragmentContainer(PagePreview, {
   page: graphql`
