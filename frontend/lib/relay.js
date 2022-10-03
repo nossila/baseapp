@@ -55,8 +55,6 @@ export async function getRelayStaticProps(query, variables, options) {
   const queryProps = await fetchQuery(environment, query, variables, options)
   const initialRecords = environment.getStore().getSource().toJSON()
 
-  console.log('initialRecords', initialRecords)
-
   return {
     props: {
       ...queryProps,
