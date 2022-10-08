@@ -1,0 +1,59 @@
+version: '3'
+services:
+  # db:
+  #   image: 'postgis/postgis:14-3.3'
+  #   env_file: .env
+  #   environment:
+  #     POSTGRES_PASSWORD: 'postgres'
+  #     POSTGRES_USER: 'postgres'
+  #     POSTGRES_DB: 'postgres'
+  #   expose:
+  #     - 5432
+  #   restart: always
+  #   volumes:
+  #     - db:/var/lib/postgresql/data
+  backend:
+    command: '/bin/bash -c "chmod +x /usr/src/app/docker-entrypoint.sh && /usr/src/app/docker-entrypoint.sh"'
+    env_file: .env
+    environment:
+      # DB_NAME: 'postgres'
+      # DB_PASS: 'postgres'
+      # # DB_PORT: '5432'
+      # DB_SERVICE: 'postgres'
+      # DB_USER: 'postgres'
+      DEBUG: 'true'
+      GUNICORN_TIMEOUT: '900'
+    expose:
+      - '8000'
+    build: ./backend
+    # links:
+    #   - 'db:postgres'
+    ports:
+      - 8000:8000
+    restart: always
+    volumes:
+      - ./backend:/usr/src/app
+      - public:/usr/src/app/public
+      - static:/usr/src/app/static
+  # frontend:
+  #   environment:
+  #     GRAPHQL_HOST: 'backend'
+  #     GRAPHQL_PORT: '9090'
+  #     HOST: '0.0.0.0'
+  #     PORT: '3000'
+  #   image: 'node:14'
+  #   working_dir: /home/node/app
+  #   volumes:
+  #     - ./frontend:/home/node/app
+  #   command: "./entrypoint.sh"
+  #   links:
+  #     - backend
+  #   ports:
+  #     - 3000:3000
+  #   restart: always
+
+volumes:
+    db:
+    public:
+    static:
+
