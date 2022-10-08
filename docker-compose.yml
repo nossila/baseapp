@@ -13,7 +13,7 @@ services:
   #   volumes:
   #     - db:/var/lib/postgresql/data
   backend:
-    command: '/bin/bash -c "chmod +x /usr/src/app/docker-entrypoint.sh && /usr/src/app/docker-entrypoint.sh"'
+    command: '/bin/bash /usr/src/app/docker-entrypoint.sh'
     env_file: .env
     environment:
       # DB_NAME: 'postgres'
@@ -35,22 +35,21 @@ services:
       - ./backend:/usr/src/app
       - public:/usr/src/app/public
       - static:/usr/src/app/static
-  # frontend:
-  #   environment:
-  #     GRAPHQL_HOST: 'backend'
-  #     GRAPHQL_PORT: '9090'
-  #     HOST: '0.0.0.0'
-  #     PORT: '3000'
-  #   image: 'node:14'
-  #   working_dir: /home/node/app
-  #   volumes:
-  #     - ./frontend:/home/node/app
-  #   command: "./entrypoint.sh"
-  #   links:
-  #     - backend
-  #   ports:
-  #     - 3000:3000
-  #   restart: always
+  frontend:
+    environment:
+      RELAY_ENDPOINT: 'http://backend:8000/graphql'
+      HOST: '0.0.0.0'
+      PORT: '3000'
+    image: 'node:14'
+    working_dir: /home/node/app
+    volumes:
+      - ./frontend:/home/node/app
+    command: "/bin/bash /home/node/app/docker-entrypoint.sh"
+    links:
+      - backend
+    ports:
+      - 3000:3000
+    restart: always
 
 volumes:
     db:
