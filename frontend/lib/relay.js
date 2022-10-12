@@ -53,7 +53,7 @@ export function useEnvironment(initialRecords) {
 }
 
 export async function getRelayStaticProps(query, variables, options) {
-const environment = initEnvironment(undefined, process.env.RELAY_ENDPOINT)
+  const environment = initEnvironment(undefined, process.env.RELAY_ENDPOINT)
   const queryProps = await fetchQuery(environment, query, variables, options)
   const initialRecords = environment.getStore().getSource().toJSON()
 

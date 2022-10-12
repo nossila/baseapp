@@ -9,6 +9,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
+        ("versioning", "0001_initial"),
     ]
 
     operations = [

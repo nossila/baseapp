@@ -1,19 +1,19 @@
 import Link from 'next/link'
-// import { useRouter } from 'next/router'
+import Head from 'next/head'
 import { graphql } from 'react-relay'
 import { getRelayStaticProps } from '../lib/relay'
 
 const Page = ({ viewer }) => {
   const page = viewer?.allPages?.edges?.[0]?.node
-
-  console.log('viewer', viewer)
-  console.log('page', page?.id)
   
   if (!page) {
     return <div>not found</div>
   }
 
   return <div>
+    <Head>
+      <title>{page.title}</title>
+    </Head>
     <h1>{page.title}</h1>
     <div>Changes: {page.revisions.totalCount}</div>
   </div>
@@ -45,7 +45,6 @@ const query = graphql`
 `
 
 export async function getStaticProps(context) {
-  console.log('context', context)
   return getRelayStaticProps(query, {url: context.params.slug.join('/')})
 }
 
