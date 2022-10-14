@@ -5,6 +5,24 @@ type Query implements Node {
     id: ID!
   ): Page
   allPages(offset: Int, before: String, after: String, first: Int, last: Int, url: String): PageConnection
+  revision(
+    """The ID of the object"""
+    id: ID!
+  ): Revision
+  allRevisions(
+    offset: Int
+    before: String
+    after: String
+    first: Int
+    last: Int
+    type: RevisionType
+    contentType: ID
+    objectId: Int
+    author: ID
+
+    """Ordering"""
+    orderBy: String
+  ): RevisionConnection
   viewer: Query
   node(
     """The ID of the object"""
@@ -41,11 +59,12 @@ type Revision implements Node {
   type: RevisionType
   parent: Revision
   objectId: Int
+  author: User
   authorIp: String
   authorUseragent: String
   message: String
   createdAt: DateTime!
-  revisionSet(offset: Int, before: String, after: String, first: Int, last: Int): RevisionConnection!
+  revisionSet(offset: Int, before: String, after: String, first: Int, last: Int, type: RevisionType): RevisionConnection!
   page: Page
   pagerevisionSet(offset: Int, before: String, after: String, first: Int, last: Int, url: String): PageConnection!
   after(offset: Int, before: String, after: String, first: Int, last: Int): RevisionConnection
@@ -64,6 +83,26 @@ enum RevisionType {
 
   """Delete"""
   DELETE
+}
+
+type User implements Node {
+  """The ID of the object"""
+  id: ID!
+  lastLogin: DateTime
+
+  """Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."""
+  username: String!
+  firstName: String!
+  lastName: String!
+  email: String!
+
+  """
+  Designates whether this user should be treated as active. Unselect this instead of deleting accounts.
+  """
+  isActive: Boolean!
+  dateJoined: DateTime!
+  revisions(offset: Int, before: String, after: String, first: Int, last: Int, type: RevisionType): RevisionConnection!
+  isAuthenticated: Boolean
 }
 
 """
@@ -199,6 +238,7 @@ type DjangoDebugException {
 type Mutation {
   pageCreate(input: PageCreateInput!): PageCreatePayload
   pageUpdate(input: PageUpdateInput!): PageUpdatePayload
+  pageDelete(input: PageDeleteInput!): PageDeletePayload
 }
 
 type PageCreatePayload {
@@ -225,5 +265,15 @@ type PageUpdatePayload {
 input PageUpdateInput {
   id: ID!
   page: PageInput!
+  clientMutationId: String
+}
+
+type PageDeletePayload {
+  deletedID: ID!
+  clientMutationId: String
+}
+
+input PageDeleteInput {
+  id: ID!
   clientMutationId: String
 }
