@@ -1,18 +1,10 @@
+import { getClientEnvironment } from '../lib/relay_client_environment';
+import { withRelay } from 'relay-nextjs';
 import Link from 'next/link'
-import { graphql } from 'react-relay'
-import { getRelayStaticProps } from '../lib/relay'
+import { graphql, usePreloadedQuery } from 'react-relay';
 import Pages from '../components/Pages'
 
-const Index = ({ viewer }) => (
-  <div>
-    <Link href="/about">
-      <a>About</a>
-    </Link>
-    <Pages viewer={viewer} />
-  </div>
-)
-
-const query = graphql`
+const IndexQuery = graphql`
   query pagesIndexQuery {
     viewer {
       ...Pages_viewer
@@ -20,8 +12,24 @@ const query = graphql`
   }
 `
 
-export async function getStaticProps() {
-  return getRelayStaticProps(query)
+const Index = ({preloadedQuery}) => {
+  const query = usePreloadedQuery(IndexQuery, preloadedQuery);
+  return <div>
+    <Link href="/about">
+      <a>About</a>
+    </Link>
+    <Pages viewer={query.viewer} />
+  </div>
 }
 
-export default Index
+
+export default withRelay(Index, IndexQuery, {
+  createClientEnvironment: () => getClientEnvironment(),
+  createServerEnvironment: async () => {
+    const { createServerEnvironment } = await import(
+      '../lib/server/relay_server_environment'
+    );
+
+    return createServerEnvironment();
+  },
+});

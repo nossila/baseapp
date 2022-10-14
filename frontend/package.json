@@ -1,23 +1,30 @@
 {
+  "name": "example",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "relay": "relay-compiler --src ./ --exclude '**/.next/**' '**/node_modules/**' '**/test/**'  '**/__generated__/**' --exclude '**/schema/**' --schema ./schema/schema.json",
-    "schema": "graphql get-schema -e dev"
+    "relay": "relay-compiler --src ./ --exclude '**/.next/**' '**/node_modules/**' '**/test/**'  '**/__generated__/**' --exclude '**/schema/**' --schema ./schema.graphql --artifactDirectory './__generated__'"
   },
   "dependencies": {
-    "graphql": "15",
-    "graphql-ws": "^5.11.2",
-    "next": "^12.3.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-relay": "9"
+    "next": "^12.1.0",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "react-relay": "^13.1.1",
+    "relay-nextjs": "^0.7.0",
+    "relay-runtime": "^13.1.1"
   },
   "devDependencies": {
+    "@types/node": "^17.0.21",
+    "@types/react": "^17.0.3",
+    "@types/react-dom": "^17.0.3",
+    "@types/react-relay": "^13.0.1",
+    "@types/relay-runtime": "^11.0.0",
     "babel-plugin-relay": "^14.1.0",
-    "graphql-cli": "^4.1.0",
-    "relay-compiler": "12"
+    "graphql": "^15.5.0",
+    "relay-compiler": "12",
+    "typescript": "^4.5.5"
   }
 }

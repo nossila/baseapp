@@ -1,7 +1,7 @@
 #!/bin/bash -xe
 python manage.py migrate # Apply database migrations
 # python manage.py collectstatic --noinput # Collect static files
-python manage.py graphql_schema --out ./public/schema.json
+python manage.py graphql_schema --out ./schema.graphql
 
 # Prepare log files and start outputting logs to stdout
 # touch /var/log/gunicorn.log

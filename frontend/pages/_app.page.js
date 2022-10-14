@@ -1,12 +1,22 @@
-import { ReactRelayContext } from 'react-relay'
-import { useEnvironment } from '../lib/relay'
+import { RelayEnvironmentProvider } from 'react-relay/hooks';
+import { getInitialPreloadedQuery, getRelayProps } from 'relay-nextjs/app';
+import { getClientEnvironment } from '../lib/relay_client_environment';
 
-export default function App({ Component, pageProps }) {
-  const environment = useEnvironment(pageProps.initialRecords)
+
+const clientEnv = getClientEnvironment();
+const initialPreloadedQuery = getInitialPreloadedQuery({
+  createClientEnvironment: () => getClientEnvironment(),
+});
+
+function ExampleApp({ Component, pageProps }) {
+  const relayProps = getRelayProps(pageProps, initialPreloadedQuery);
+  const env = relayProps.preloadedQuery?.environment ?? clientEnv;
 
   return (
-    <ReactRelayContext.Provider value={{ environment, variables: {} }}>
-      <Component {...pageProps} />
-    </ReactRelayContext.Provider>
-  )
+    <RelayEnvironmentProvider environment={env}>
+      <Component {...pageProps} {...relayProps} />
+    </RelayEnvironmentProvider>
+  );
 }
+
+export default ExampleApp;
