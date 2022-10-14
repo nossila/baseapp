@@ -1,23 +1,30 @@
 import Head from 'next/head'
 import { usePageCreateMutation } from './create.mutation'
 import { useForm } from "react-hook-form";
+import { useRouter} from 'next/router'
 
 const PageCreate = (props) => {
-  const mutation = usePageCreateMutation()
+  const [commit] = usePageCreateMutation()
+  const router = useRouter()
 
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
   const onSubmit = data => {
-    mutation.commit(
-      {
-        title: data.title,
-        body: data.body,
+    commit({
+      variables: {
+        input: {
+          page: {
+            title: data.title,
+            body: data.body,
+            url: data.url,
+          }
+        },
       },
-      {
-        onSuccess: () => {},
-        onError: () => {},
-      }
-    )
+      onCompleted(data) {
+        router.push(`/${data.pageCreate.page.url}`)
+      },
+    })
   };
+  
 
   return <div>
     <Head>
@@ -26,11 +33,17 @@ const PageCreate = (props) => {
     <h1>Create page</h1>
     <form onSubmit={handleSubmit(onSubmit)}>
       <p>
-        <label>Title 
-          <input type="text" {...register("title")} /></label>
+        <label>Title <br />
+        <input type="text" {...register("title", { required: true })} /></label>
+        {errors.title && <span><br />This field is required</span>}
+      </p>
+      <p><label>Body <br />
+        <textarea id="body" {...register("body", { required: true })} />
+        </label>
       </p>
       <p>
-        <label>Body <textarea {...register("body")} /></label>
+        <label>URL <br />
+          <input type="text" {...register("url", { required: true })} /></label>
       </p>
       <button type="submit">Save</button>
     </form>
