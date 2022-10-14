@@ -3,12 +3,14 @@ from graphene import relay
 from graphene_django import DjangoConnectionField, DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 from graphene_django.registry import get_global_registry
+from django_filters import FilterSet, OrderingFilter
 
 #  from .models_graphql import Revision
 #  from .types import DocumentBase
 from .models import Revision as RevisionModel, REVISION_TYPES
 from django.contrib.contenttypes.models import ContentType
 from backend.graphene import CountedConnection
+from users.graphql_schema import User
 
 class RevisionType(graphene.Enum):
     CREATE = REVISION_TYPES.create
@@ -41,7 +43,7 @@ def get_versioned_type():
 
 class Revision(DjangoObjectType):
     #  id_int = graphene.Int()
-    #  author = graphene.Field(User)
+    author = graphene.Field(User)
     after = DjangoConnectionField(lambda: Revision)
     before = graphene.Field(lambda: Revision)
     #  document = graphene.Field(get_document_type)
@@ -115,7 +117,17 @@ class RevisionedType(graphene.Interface):
         ).order_by('-created_at')
 
 
+class RevisionFilterSet(FilterSet):
+    class Meta:
+        model = RevisionModel
+        fields = ['type', 'content_type', 'object_id', 'author']
+
+    order_by = OrderingFilter(
+        fields=(
+            'created_at',
+        )
+    )
+
 class Query:
-    #  pass
     revision = relay.Node.Field(Revision)
-    all_revisions = DjangoFilterConnectionField(Revision)
+    all_revisions = DjangoFilterConnectionField(Revision, filterset_class=RevisionFilterSet)
