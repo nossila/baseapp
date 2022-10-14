@@ -70,7 +70,7 @@ class RevisionedModel(models.Model):
         else:
             revision_type = REVISION_TYPES.update
 
-        revision = Revision.objects.create(
+        self.revision = Revision.objects.create(
             type=revision_type,
             content_type=ContentType.objects.get_for_model(self),
             parent_id=parent_id,
@@ -79,8 +79,6 @@ class RevisionedModel(models.Model):
             author_useragent=useragent,
             message=message,
         )
-
-        self.revision = revision
 
     def save(self, *args, **kwargs):
         self._start_revision(*args, **kwargs)
@@ -98,7 +96,8 @@ class RevisionedModel(models.Model):
     def delete(self, *args, **kwargs):
         self._is_deleted = True
         self._start_revision(*args, **kwargs)
+        self.save_revision()
         self.revision.object_id = self.pk
         self.revision.save(update_fields=["object_id"])
-        self.delete()
+        super().delete()
 
