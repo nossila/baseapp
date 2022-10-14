@@ -15,7 +15,7 @@ const Pages = ({ viewer }) => {
 export default createFragmentContainer(Pages, {
   viewer: graphql`
     fragment Pages_viewer on Query {
-      allPages(first: 10) {
+      allPages {
         edges {
           node {
             ...PagePreview_post

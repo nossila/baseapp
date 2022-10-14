@@ -1,18 +1,14 @@
 import { graphql, useMutation, useRelayEnvironment } from "react-relay";
 
 const mutation = graphql`
-  mutation createPageMutation($input: PageCreateInput!) {
-    pageCreate(input: $input) {
-      page {
-        id
-        title
-        url
-      }
+  mutation deletePageMutation($input: PageDeleteInput!) {
+    pageDelete(input: $input) {
+      deletedID
     }
   }
 `;
 
-export function usePageCreateMutation() {
+export function usePageDeleteMutation() {
   const environment = useRelayEnvironment()
   return useMutation(mutation)
 }

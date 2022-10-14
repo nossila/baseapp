@@ -1,9 +1,11 @@
 import Head from 'next/head'
 import { usePageCreateMutation } from './create.mutation'
 import { useForm } from "react-hook-form";
+import { useRouter} from 'next/router'
 
 const PageCreate = (props) => {
   const [commit] = usePageCreateMutation()
+  const router = useRouter()
 
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
   const onSubmit = data => {
@@ -18,10 +20,11 @@ const PageCreate = (props) => {
         },
       },
       onCompleted(data) {
-        console.log(data);
+        router.push(`/${data.pageCreate.page.url}`)
       },
     })
   };
+  
 
   return <div>
     <Head>
@@ -35,12 +38,12 @@ const PageCreate = (props) => {
         {errors.title && <span><br />This field is required</span>}
       </p>
       <p><label>Body <br />
-        <textarea id="body" {...register("body")} />
+        <textarea id="body" {...register("body", { required: true })} />
         </label>
       </p>
       <p>
         <label>URL <br />
-          <input type="text" {...register("url")} /></label>
+          <input type="text" {...register("url", { required: true })} /></label>
       </p>
       <button type="submit">Save</button>
     </form>

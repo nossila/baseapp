@@ -1,7 +1,7 @@
 import { RelayEnvironmentProvider } from 'react-relay/hooks';
 import { getInitialPreloadedQuery, getRelayProps } from 'relay-nextjs/app';
 import { getClientEnvironment } from '../lib/relay_client_environment';
-
+import Link from 'next/link'
 
 const clientEnv = getClientEnvironment();
 const initialPreloadedQuery = getInitialPreloadedQuery({
@@ -14,6 +14,7 @@ function ExampleApp({ Component, pageProps }) {
 
   return (
     <RelayEnvironmentProvider environment={env}>
+      <Link href="/">Home</Link>
       <Component {...pageProps} {...relayProps} />
     </RelayEnvironmentProvider>
   );
