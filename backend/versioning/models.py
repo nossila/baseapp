@@ -34,13 +34,13 @@ class Revision(models.Model):
 
 class RevisionedModel(models.Model):
     revision = models.OneToOneField(Revision, on_delete=models.PROTECT)
-    
+
     # objects_revisions returnar o queryset das versoes? 
 
     class Meta:
         abstract = True
 
-    def save(self, *args, **kwargs):
+    def _start_revision(self, *args, **kwargs):
         request = kwargs.pop("request", None)
         message = kwargs.pop("message", None)
         parent = kwargs.pop("parent", None)
@@ -65,8 +65,8 @@ class RevisionedModel(models.Model):
         revision_type = None
         if not parent_id:
             revision_type = REVISION_TYPES.create
-        #  elif self.is_deleted:
-        #      revision_type = REVISION_TYPES.delete
+        elif self._is_deleted:
+            revision_type = REVISION_TYPES.delete
         else:
             revision_type = REVISION_TYPES.update
 
@@ -82,6 +82,8 @@ class RevisionedModel(models.Model):
 
         self.revision = revision
 
+    def save(self, *args, **kwargs):
+        self._start_revision(*args, **kwargs)
         super().save(*args, **kwargs)
         self.save_revision()
 
@@ -92,4 +94,11 @@ class RevisionedModel(models.Model):
         for name, value in payload.items():
             setattr(self, name, value)
         self.save(request=request)
+
+    def delete(self, *args, **kwargs):
+        self._is_deleted = True
+        self._start_revision(*args, **kwargs)
+        self.revision.object_id = self.pk
+        self.revision.save(update_fields=["object_id"])
+        self.delete()
 

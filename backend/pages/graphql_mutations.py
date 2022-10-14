@@ -50,6 +50,27 @@ class PageUpdate(graphene.relay.ClientIDMutation):
         return PageUpdate(page=page)
 
 
+class PageDelete(graphene.relay.ClientIDMutation):
+    class Input:
+        id = graphene.ID(required=True)
+
+    deletedID = graphene.ID(required=True)
+
+    @classmethod
+    def mutate_and_get_payload(cls, root, info, **input):
+        gid_type, gid = from_global_id(input.get('id'))
+        page = PageModel.objects.get(pk=gid)
+
+        #  error = has_permission(cls, info.context, page, 'delete')
+        #  if error:
+        #      return error
+
+        page.delete(request=info.context)
+
+        return PageDelete(deletedID=input.get('id'))
+
+
 class Mutation:
     page_create = PageCreate.Field()
     page_update = PageUpdate.Field()
+    page_delete = PageDelete.Field()

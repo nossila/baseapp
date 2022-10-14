@@ -1,6 +1,7 @@
 from graphene import ObjectType, Schema, Field, ID, relay
 from graphene.relay.node import NodeField as RelayNodeField
 from graphene_django.debug import DjangoDebug
+from versioning.graphql_schema import Query as VersioningQuery
 from pages.graphql_schema import Query as PagesQuery
 from pages.graphql_mutations import Mutation as PagesMutation
 
@@ -22,7 +23,7 @@ class NodeField(RelayNodeField):
         return get_node
 
 
-class Query(PagesQuery, ObjectType):
+class Query(VersioningQuery, PagesQuery, ObjectType):
     id = ID(required=True)
     viewer = Field(lambda: Query)
 

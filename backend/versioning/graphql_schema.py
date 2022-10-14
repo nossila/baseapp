@@ -1,5 +1,7 @@
 import graphene
+from graphene import relay
 from graphene_django import DjangoConnectionField, DjangoObjectType
+from graphene_django.filter import DjangoFilterConnectionField
 from graphene_django.registry import get_global_registry
 
 #  from .models_graphql import Revision
@@ -52,6 +54,9 @@ class Revision(DjangoObjectType):
         model = RevisionModel
         interfaces = (graphene.relay.Node, )
         connection_class = CountedConnection
+        filter_fields = {
+            'type': ['exact']
+        }
         #  convert_choices_to_enum = ["type"] # nao testei, mas na teoria funciona
 
     def resolve_id_int(self, info):
@@ -108,3 +113,9 @@ class RevisionedType(graphene.Interface):
             content_type=ContentType.objects.get_for_model(self),
             object_id=self.pk,
         ).order_by('-created_at')
+
+
+class Query:
+    #  pass
+    revision = relay.Node.Field(Revision)
+    all_revisions = DjangoFilterConnectionField(Revision)
