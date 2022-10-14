@@ -65,7 +65,11 @@ class PageDelete(graphene.relay.ClientIDMutation):
         #  if error:
         #      return error
 
-        page.delete(request=info.context)
+        try:
+            page.delete(request=info.context)
+        except Exception as e:
+            print(e)
+            raise e
 
         return PageDelete(deletedID=input.get('id'))
 
@@ -74,3 +78,4 @@ class Mutation:
     page_create = PageCreate.Field()
     page_update = PageUpdate.Field()
     page_delete = PageDelete.Field()
+

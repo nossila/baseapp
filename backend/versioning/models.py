@@ -31,20 +31,22 @@ class Revision(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
+class SoftDeleteManager(models.Manager):
+    def get_queryset(self):
+        return super(SoftDeleteManager, self).get_queryset().filter(is_deleted=False)
+
 
 class RevisionedModel(models.Model):
     revision = models.OneToOneField(Revision, on_delete=models.PROTECT)
+    is_deleted = models.BooleanField(default=False)
 
     # objects_revisions returnar o queryset das versoes? 
+    objects = SoftDeleteManager()
 
     class Meta:
         abstract = True
 
-    def _start_revision(self, *args, **kwargs):
-        request = kwargs.pop("request", None)
-        message = kwargs.pop("message", None)
-        parent = kwargs.pop("parent", None)
-
+    def _start_revision(self, request=None, message=None, parent=None):
         parent_id = None
         if self.revision_id and not parent:
             parent_id = self.revision_id
@@ -65,7 +67,7 @@ class RevisionedModel(models.Model):
         revision_type = None
         if not parent_id:
             revision_type = REVISION_TYPES.create
-        elif self._is_deleted:
+        elif self.is_deleted:
             revision_type = REVISION_TYPES.delete
         else:
             revision_type = REVISION_TYPES.update
@@ -81,8 +83,13 @@ class RevisionedModel(models.Model):
         )
 
     def save(self, *args, **kwargs):
-        self._start_revision(*args, **kwargs)
+        request = kwargs.pop("request", None)
+        message = kwargs.pop("message", None)
+        parent = kwargs.pop("parent", None)
+        self._start_revision(request=request, message=message, parent=parent)
+
         super().save(*args, **kwargs)
+
         self.save_revision()
 
         self.revision.object_id = self.pk
@@ -94,10 +101,17 @@ class RevisionedModel(models.Model):
         self.save(request=request)
 
     def delete(self, *args, **kwargs):
-        self._is_deleted = True
-        self._start_revision(*args, **kwargs)
-        self.save_revision()
-        self.revision.object_id = self.pk
-        self.revision.save(update_fields=["object_id"])
-        super().delete()
+        request = kwargs.pop("request", None)
+        message = kwargs.pop("message", None)
+        parent = kwargs.pop("parent", None)
+
+        self.is_deleted = True
+        self.save(request=request, message=message, parent=parent)
+        #  self.save(update_fields=["is_deleted"])
+        #  self._start_revision(request=request, message=message, parent=parent)
+        #  self.save_revision()
+        #  self.revision.object_id = self.pk
+        #  self.revision.save(update_fields=["object_id"])
+
+        #  super().delete()
 
