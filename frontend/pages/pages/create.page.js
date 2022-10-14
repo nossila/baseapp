@@ -20,6 +20,7 @@ const PageCreate = (props) => {
         },
       },
       onCompleted(data) {
+        console.log(data)
         router.push(`/${data.pageCreate.page.url}`)
       },
     })

@@ -14,6 +14,7 @@ const PageQuery = graphql`
           node {
             id
             title
+            body
             revisions(last: 1) {
               totalCount
               edges {
@@ -47,9 +48,11 @@ const Page = ({preloadedQuery}) => {
       <title>{page.title}</title>
     </Head>
     <h1>{page.title}</h1>
-    <div>Edit: <Link href={`/pages/update/${page.id}`}>Edit page</Link></div>
-    <div>Changes: {page.revisions.totalCount}</div>
-    <div>Delete: <button onClick={() => commit({
+    <div>{page.body}</div>
+    <div>Changes: {page.revisions.totalCount} | <Link href={`/pages/update/${page.id}`}>Edit page</Link></div>
+    <div>
+      <hr />
+      <button onClick={() => commit({
         variables: {
           input: {
             id: page.id,
@@ -58,7 +61,7 @@ const Page = ({preloadedQuery}) => {
         onCompleted(data) {
           // router.push('/')
         },
-      })}>Delete</button></div>
+      })}>Delete page</button></div>
   </div>
 }
 

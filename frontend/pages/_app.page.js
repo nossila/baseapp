@@ -16,6 +16,10 @@ function ExampleApp({ Component, pageProps }) {
   return (
     <RelayEnvironmentProvider environment={env}>
       <Link href="/">Home</Link>
+      { ' | ' }
+      <Link href="/pages/create">Create page</Link>
+      { ' | ' }
+      <Link href="/timeline">Timeline</Link>
       <Component {...pageProps} {...relayProps} />
     </RelayEnvironmentProvider>
   );
