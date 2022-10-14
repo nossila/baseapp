@@ -1,4 +1,4 @@
-import { graphql, useMutation, useEnvironment } from "react-relay";
+import { graphql, useMutation, useRelayEnvironment } from "react-relay";
 
 const mutation = graphql`
   mutation createPageMutation($input: PageCreateInput!) {
@@ -13,7 +13,7 @@ const mutation = graphql`
 `;
 
 export function usePageCreateMutation() {
-  const environment = useEnvironment()
+  const environment = useRelayEnvironment()
   return useMutation(mutation)
 }
 
