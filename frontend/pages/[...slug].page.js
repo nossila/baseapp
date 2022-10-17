@@ -49,17 +49,17 @@ const Page = ({preloadedQuery}) => {
     </Head>
     <h1>{page.title}</h1>
     <div>{page.body}</div>
-    <div>Changes: {page.revisions.totalCount} | <Link href={`/pages/update/${page.id}`}>Edit page</Link></div>
-    <div>
-      <hr />
-      <button onClick={() => commit({
+		<br />
+		<hr />
+		<br />
+    <div>Changes: {page.revisions.totalCount} | <Link href={`/pages/update/${page.id}`}>Edit page</Link> | <button onClick={() => commit({
         variables: {
           input: {
             id: page.id,
           },
         },
         onCompleted(data) {
-          // router.push('/')
+					router.push('/')
         },
       })}>Delete page</button></div>
   </div>

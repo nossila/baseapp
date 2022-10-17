@@ -35,7 +35,7 @@ function TimeLineBlock({ data, direction }) {
         <div className="row">
           <Link href={data.contentObject.url}>
             <a className="content-title">
-              {data.contentObject.__typename || "Page"} {data.contentObject?.title}
+              {data.contentObject.__typename || "Page"}{': '} {data.contentObject?.title}
             </a>
           </Link>
           <div>
