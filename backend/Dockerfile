@@ -30,6 +30,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . /usr/src/app
 
+RUN ln -s /usr/src/app/django-pghistory/pghistory /usr/local/lib/python3.11/site-packages/pghistory
+
 EXPOSE 9090
 RUN chmod +x /usr/src/app/docker-entrypoint.sh
 CMD ["/usr/src/app/docker-entrypoint.sh"]

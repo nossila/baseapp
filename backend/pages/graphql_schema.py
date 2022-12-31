@@ -6,9 +6,9 @@ from graphene_django.registry import get_global_registry
 #  from db.types_revision import DocumentNode, DocumentBase
 #  from db.graphene import CountedConnection
 
-from .models import Page as PageModel, PageRevision
+from .models import Page as PageModel
 from backend.graphene import CountedConnection
-from versioning.graphql_schema import RevisionedType
+#  from versioning.graphql_schema import RevisionedType
 #  from commenting.models_graphql import CommentsNode
 #  from images.models_graphql import ImagesNode
 
@@ -16,7 +16,7 @@ from versioning.graphql_schema import RevisionedType
 class Page(DjangoObjectType):
     class Meta:
         model = PageModel
-        interfaces = (relay.Node, RevisionedType)
+        interfaces = (relay.Node,)
         filter_fields = {
             'url': ['exact']
         }
@@ -28,11 +28,11 @@ class Page(DjangoObjectType):
 
     @classmethod
     def is_type_of(cls, root, info):
-        return isinstance(root, (PageModel, PageRevision))
+        return isinstance(root, (PageModel,))
 
 # passar sisso aqui pro contribute to class do RevisionedModel
-registry = get_global_registry()
-registry._registry[PageRevision] = Page
+#  registry = get_global_registry()
+#  registry._registry[PageRevision] = Page
 
 
 class Query:

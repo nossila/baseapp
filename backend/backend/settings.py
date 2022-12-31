@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,10 +21,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-p1=h3sszv(-72h&ik8k!_o!ze5=w-6xtq9pe+lf%!7ppwr!nem'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = True if os.getenv('DEBUG') == 'true' else False
 
 ALLOWED_HOSTS = ["*"]
 
@@ -39,8 +40,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'graphene_django',
+    'pgtrigger',
+    'pghistory',
+    'pghistory.admin',
+
     'pages',
-    'versioning',
 ]
 
 MIDDLEWARE = [
@@ -80,8 +84,13 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASS'),
+        'HOST': os.getenv('DB_SERVICE'),
+        'PORT': os.getenv('DB_PORT'),
+        'ATOMIC_REQUESTS': True,
     }
 }
 
